@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Funlet</title>
+
+  <style>
+    body { font-family: Arial; text-align:center; background:#111; color:white; }
+    button { padding:10px; margin:5px; border-radius:10px; background:#4CAF50; color:white; border:none; }
+    .Uncommon { color:gray; }
+    .Rare { color:blue; }
+    .Epic { color:purple; }
+    .Legendary { color:orange; }
+    .Chroma { animation: rainbow 1s infinite; }
+    .Mystical { color:gold; font-size:30px; }
+
+    @keyframes rainbow {
+      0%{color:red;}25%{color:yellow;}50%{color:green;}75%{color:blue;}100%{color:purple;}
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🎮 Funlet</h1>
+<h2>💰 Tokens: <span id="tokens"></span></h2>
+
+<h3>🛒 Packs (20 tokens)</h3>
+<button onclick="openPack('toy')">Toy</button>
+<button onclick="openPack('sport')">Sport</button>
+
+<h3 id="result"></h3>
+
+<h3>🎒 Inventory</h3>
+<ul id="items"></ul>
+
+<hr>
+
+<h3>💬 Global Chat</h3>
+<ul id="chat"></ul>
+<input id="chatInput">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+let tokens = 100000;
+let inventory = [];
+
+function updateTokens(){ document.getElementById("tokens").innerText = tokens; }
+
+function updateInventory(){
+  let list = document.getElementById("items");
+  list.innerHTML="";
+  inventory.forEach(item=>{
+    let li=document.createElement("li");
+    li.innerText=item.name+" ("+item.rarity+")";
+    list.appendChild(li);
+  });
+}
+
+function getRarity(){
+  let r=Math.random()*100;
+  if(r<0.001) return "Mystical";
+  if(r<0.02) return "Chroma";
+  if(r<0.5) return "Legendary";
+  if(r<3) return "Epic";
+  if(r<15) return "Rare";
+  return "Uncommon";
+}
+
+const packs={
+  toy:{Uncommon:["Toy Car"],Rare:["Lego"],Epic:["Robot"],Legendary:["Mega Toy"],Chroma:["Rainbow Toy"],Mystical:["Golden Toy"]},
+  sport:{Uncommon:["Ball"],Rare:["Basketball"],Epic:["Gear"],Legendary:["Jersey"],Chroma:["Neon Ball"],Mystical:["Trophy"]}
+};
+
+function openPack(type){
+  if(tokens<20) return;
+  tokens-=20;
+  let rarity=getRarity();
+  let reward=packs[type][rarity][0];
+  inventory.push({name:reward,rarity:rarity});
+  document.getElementById("result").innerText="You got "+reward+" ["+rarity+"]";
+
+  fakeEvent(reward,rarity);
+
+  updateTokens();
+  updateInventory();
+}
+
+// 💬 FAKE CHAT SYSTEM
+let names=["Player123","NoobMaster","CoolKid","ProGamer","Legend"];
+
+function sendMessage(){
+  let msg=document.getElementById("chatInput").value;
+  if(!msg) return;
+  addChat("You",msg);
+  document.getElementById("chatInput").value="";
+}
+
+function addChat(user,msg){
+  let li=document.createElement("li");
+  li.innerText=user+": "+msg;
+  document.getElementById("chat").appendChild(li);
+}
+
+// 🤖 FAKE PLAYERS TALKING
+setInterval(()=>{
+  let msgs=["hi","anyone here?","just got legendary!","lol","this game is fun"];
+  addChat(names[Math.floor(Math.random()*names.length)],
+          msgs[Math.floor(Math.random()*msgs.length)]);
+},4000);
+
+// 🎉 GLOBAL EVENTS
+function fakeEvent(item,rarity){
+  addChat("SYSTEM","Someone got "+item+" ["+rarity+"]!");
+}
+
+updateTokens();
+updateInventory();
+</script>
+
+</body>
+</html>
