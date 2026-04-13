@@ -1,338 +1,128 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Funlet ULTIMATE</title>
-
-  <style>
-    body {
-      margin:0;
-      font-family:Arial;
-      display:flex;
-      background:#3cc0d0;
-    }
-
-    #sidebar {
-      width:220px;
-      background:#8e44ad;
-      color:white;
-      height:100vh;
-      padding:20px;
-    }
-
-    .menu { padding:10px; margin:8px 0; border-radius:10px; }
-    .active { background:white; color:black; }
-
-    #main {
-      flex:1;
-      padding:20px;
-      text-align:center;
-    }
-
-    #topbar {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-
-    #tokens {
-      background:#8e44ad;
-      padding:10px;
-      border-radius:10px;
-      font-weight:bold;
-    }
-
-    h1 { color:white; }
-
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(3,200px);
-      gap:20px;
-      justify-content:center;
-      margin-top:20px;
-    }
-
-    .pack {
-      background:#5dade2;
-      border-radius:20px;
-      padding:10px;
-      cursor:pointer;
-      transition:0.2s;
-    }
-
-    .pack:hover {
-      transform:scale(1.07) rotate(-1deg);
-    }
-
-    .pack img {
-      width:100%;
-      border-radius:15px;
-    }
-
-    .price {
-      background:#3498db;
-      padding:8px;
-      border-radius:10px;
-      margin-top:5px;
-      font-weight:bold;
-    }
-
-    /* OPEN SCREEN */
-    #openScreen {
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      background:rgba(0,0,0,0.95);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-    }
-
-    /* CARD FLIP */
-    .cardWrap {
-      width:220px;
-      height:280px;
-      perspective:1000px;
-    }
-
-    .cardInner {
-      width:100%;
-      height:100%;
-      transition:transform 0.6s;
-      transform-style:preserve-3d;
-      position:relative;
-    }
-
-    .flip {
-      transform:rotateY(180deg);
-    }
-
-    .cardFace {
-      position:absolute;
-      width:100%;
-      height:100%;
-      border-radius:20px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      backface-visibility:hidden;
-      font-weight:bold;
-    }
-
-    /* BACK (YELLOW 🔥) */
-    .cardBack {
-      background:gold;
-      color:black;
-    }
-
-    /* FRONT */
-    .cardFront {
-      transform:rotateY(180deg);
-    }
-
-    .cardFront img {
-      width:90px;
-    }
-
-    /* RARITY GLOW */
-    .Uncommon { background:#6b7280; }
-    .Rare { background:#3b82f6; box-shadow:0 0 20px #3b82f6; }
-    .Epic { background:#a855f7; box-shadow:0 0 25px #a855f7; }
-    .Legendary { background:#f59e0b; box-shadow:0 0 35px #f59e0b; animation:pulse 1s infinite; }
-    .Chroma { background:linear-gradient(45deg,red,yellow,green,blue); animation:pulse 1s infinite; }
-    .Mystical { background:gold; box-shadow:0 0 50px gold; animation:pulse 0.5s infinite; }
-
-    @keyframes pulse {
-      0%{transform:scale(1);}
-      50%{transform:scale(1.05);}
-      100%{transform:scale(1);}
-    }
-
-    #flash {
-      position:fixed;
-      width:100%;
-      height:100%;
-      background:white;
-      opacity:0;
-      pointer-events:none;
-      transition:0.2s;
-    }
-
-    .flash { opacity:0.8; }
-
-    .item {
-      display:inline-block;
-      width:90px;
-      height:110px;
-      margin:5px;
-      border-radius:10px;
-      background:#334155;
-      text-align:center;
-      padding:5px;
-    }
-
-    .item img { width:60px; }
-
-  </style>
-</head>
-
-<body>
-
-<div id="flash"></div>
-
-<div id="sidebar">
-  <h2>Funlet</h2>
-  <div class="menu">Play</div>
-  <div class="menu">Stats</div>
-  <div class="menu">Blooks</div>
-  <div class="menu active">Market</div>
-</div>
-
-<div id="main">
-
-<div id="topbar">
-  <h1>Market</h1>
-  <div id="tokens"></div>
-</div>
-
 <div class="grid">
-  <div class="pack" onclick="openPack()">
-    <img src="https://picsum.photos/200/140?random=1">
+
+  <div class="pack toy" onclick="openPack('toy', this)">
+    <div class="packArt">🧸</div>
+    <div class="packName">Toy Pack</div>
     <div class="price">💰 25</div>
   </div>
-</div>
 
-<h3>Inventory</h3>
-<div id="items"></div>
-
-</div>
-
-<!-- OPEN SCREEN -->
-<div id="openScreen">
-
-<div class="cardWrap">
-  <div id="cardInner" class="cardInner">
-
-    <div class="cardFace cardBack">
-      FUNLET
-    </div>
-
-    <div id="cardFront" class="cardFace cardFront">
-    </div>
-
+  <div class="pack sport" onclick="openPack('sport', this)">
+    <div class="packArt">🏀</div>
+    <div class="packName">Sport Pack</div>
+    <div class="price">💰 25</div>
   </div>
+
+  <div class="pack game" onclick="openPack('game', this)">
+    <div class="packArt">🎮</div>
+    <div class="packName">Game Pack</div>
+    <div class="price">💰 25</div>
+  </div>
+
+  <div class="pack barbie" onclick="openPack('barbie', this)">
+    <div class="packArt">💖</div>
+    <div class="packName">Barbie Pack</div>
+    <div class="price">💰 25</div>
+  </div>
+
+  <div class="pack ice" onclick="openPack('ice', this)">
+    <div class="packArt">❄️</div>
+    <div class="packName">Ice Pack</div>
+    <div class="price">💰 25</div>
+  </div>
+
+  <div class="pack summer" onclick="openPack('summer', this)">
+    <div class="packArt">🌴</div>
+    <div class="packName">Summer Pack</div>
+    <div class="price">💰 25</div>
+  </div>
+
 </div>
-
-<h2 id="result"></h2>
-<button onclick="closeOpen()">Close</button>
-
-</div>
-
-<script>
-let tokens=100000;
-let inventory=[];
-
-const characters={
-  Uncommon:[{name:"Toy",img:"https://picsum.photos/80?1"}],
-  Rare:[{name:"Ball",img:"https://picsum.photos/80?2"}],
-  Epic:[{name:"Robot",img:"https://picsum.photos/80?3"}],
-  Legendary:[{name:"Dragon",img:"https://picsum.photos/80?4"}],
-  Chroma:[{name:"Rainbow",img:"https://picsum.photos/80?5"}],
-  Mystical:[{name:"Golden",img:"https://picsum.photos/80?6"}]
-};
-
-function getRarity(){
-  let r=Math.random()*100;
-  if(r<0.001) return "Mystical";
-  if(r<0.02) return "Chroma";
-  if(r<0.5) return "Legendary";
-  if(r<3) return "Epic";
-  if(r<15) return "Rare";
-  return "Uncommon";
+.pack {
+  border-radius: 20px;
+  padding: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  position: relative;
 }
 
-function openPack(){
-  if(tokens<25) return;
+/* CARTOON COLORS */
+.toy { background: #f39c12; }
+.sport { background: #3498db; }
+.game { background: #2ecc71; }
+.barbie { background: #ff66cc; }
+.ice { background: #5dade2; }
+.summer { background: #f1c40f; }
 
-  tokens-=25;
-  save();
+/* PACK ICON */
+.packArt {
+  font-size: 50px;
+  margin-bottom: 10px;
+}
 
-  document.getElementById("openScreen").style.display="flex";
+/* NAME */
+.packName {
+  font-size: 18px;
+}
 
-  let inner=document.getElementById("cardInner");
-  let front=document.getElementById("cardFront");
-  let flash=document.getElementById("flash");
+/* GLOW */
+.pack:hover {
+  transform: scale(1.07);
+  box-shadow: 0 0 25px white;
+}
 
-  inner.classList.remove("flip");
+/* SHAKE ANIMATION */
+@keyframes shake {
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-5px);}
+  50%{transform:translateX(5px);}
+  75%{transform:translateX(-5px);}
+  100%{transform:translateX(0);}
+}
 
-  let rarity=getRarity();
-  let char=characters[rarity][0];
+.shake {
+  animation: shake 0.3s;
+}function openPack(type, el){
+  if(tokens < 25) return;
 
-  front.className="cardFace cardFront "+rarity;
-  front.innerHTML="<img src='"+char.img+"'><br>"+char.name;
+  // 🎁 SHAKE EFFECT
+  el.classList.add("shake");
 
   setTimeout(()=>{
-    inner.classList.add("flip");
+    el.classList.remove("shake");
 
-    flash.classList.add("flash");
+    tokens -= 25;
+    updateTokens();
 
-    setTimeout(()=>{
-      flash.classList.remove("flash");
+    document.getElementById("openScreen").style.display="flex";
 
-      inventory.push(char);
-      updateInventory();
-      save();
+    let card = document.getElementById("card");
 
-      document.getElementById("result").innerText=
-        "🎉 "+char.name+" ["+rarity+"]";
-    },200);
+    let spins = 0;
 
-  },500);
+    let interval = setInterval(()=>{
+      let rarity = getRarity();
+      let list = packs[type][rarity];
+      let item = list[Math.floor(Math.random()*list.length)];
 
-  updateTokens();
+      card.className = rarity;
+      card.innerText = item;
+
+      spins++;
+
+      if(spins > 12){
+        clearInterval(interval);
+
+        inventory.push(item);
+        updateInventory();
+
+        document.getElementById("result").innerText =
+          "🎉 " + item + " [" + rarity + "]";
+      }
+
+    },100);
+
+  },300);
 }
-
-function closeOpen(){
-  document.getElementById("openScreen").style.display="none";
-}
-
-function updateTokens(){
-  document.getElementById("tokens").innerText="💰 "+tokens;
-}
-
-function updateInventory(){
-  let div=document.getElementById("items");
-  div.innerHTML="";
-  inventory.forEach(c=>{
-    let d=document.createElement("div");
-    d.className="item";
-    d.innerHTML="<img src='"+c.img+"'><br>"+c.name;
-    div.appendChild(d);
-  });
-}
-
-/* SAVE SYSTEM 💾 */
-function save(){
-  localStorage.setItem("funletTokens",tokens);
-  localStorage.setItem("funletInv",JSON.stringify(inventory));
-}
-
-function load(){
-  let t=localStorage.getItem("funletTokens");
-  let i=localStorage.getItem("funletInv");
-
-  if(t) tokens=parseInt(t);
-  if(i) inventory=JSON.parse(i);
-
-  updateTokens();
-  updateInventory();
-}
-
-load();
-</script>
-
-</body>
-</html>
