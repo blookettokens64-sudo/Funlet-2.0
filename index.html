@@ -1,54 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Funlet MAX</title>
+  <title>Funlet ULTIMATE</title>
 
   <style>
     body {
-      margin: 0;
-      font-family: Arial;
-      display: flex;
-      background: #3cc0d0;
+      margin:0;
+      font-family:Arial;
+      display:flex;
+      background:#3cc0d0;
     }
 
-    /* SIDEBAR */
     #sidebar {
-      width: 220px;
-      background: #8e44ad;
-      color: white;
-      height: 100vh;
-      padding: 20px;
+      width:220px;
+      background:#8e44ad;
+      color:white;
+      height:100vh;
+      padding:20px;
     }
 
-    .menu { margin:10px 0; padding:10px; border-radius:10px; }
+    .menu { padding:10px; margin:8px 0; border-radius:10px; }
     .active { background:white; color:black; }
 
-    /* MAIN */
     #main {
-      flex: 1;
-      padding: 25px;
-      text-align: center;
+      flex:1;
+      padding:20px;
+      text-align:center;
     }
 
     #topbar {
-      display: flex;
-      justify-content: space-between;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
 
     #tokens {
       background:#8e44ad;
       padding:10px;
       border-radius:10px;
+      font-weight:bold;
     }
 
     h1 { color:white; }
 
-    /* PACK GRID */
     .grid {
       display:grid;
       grid-template-columns:repeat(3,200px);
       gap:20px;
       justify-content:center;
+      margin-top:20px;
     }
 
     .pack {
@@ -59,59 +59,100 @@
       transition:0.2s;
     }
 
-    .pack:hover { transform:scale(1.05); }
+    .pack:hover {
+      transform:scale(1.07) rotate(-1deg);
+    }
 
-    .pack img { width:100%; border-radius:15px; }
+    .pack img {
+      width:100%;
+      border-radius:15px;
+    }
 
     .price {
       background:#3498db;
       padding:8px;
       border-radius:10px;
       margin-top:5px;
+      font-weight:bold;
     }
 
-    /* OPENING SCREEN */
+    /* OPEN SCREEN */
     #openScreen {
       position:fixed;
       top:0;
       left:0;
       width:100%;
       height:100%;
-      background:rgba(0,0,0,0.9);
+      background:rgba(0,0,0,0.95);
       display:none;
       align-items:center;
       justify-content:center;
       flex-direction:column;
     }
 
-    #card {
-      width:200px;
-      height:260px;
+    /* CARD FLIP */
+    .cardWrap {
+      width:220px;
+      height:280px;
+      perspective:1000px;
+    }
+
+    .cardInner {
+      width:100%;
+      height:100%;
+      transition:transform 0.6s;
+      transform-style:preserve-3d;
+      position:relative;
+    }
+
+    .flip {
+      transform:rotateY(180deg);
+    }
+
+    .cardFace {
+      position:absolute;
+      width:100%;
+      height:100%;
       border-radius:20px;
       display:flex;
       align-items:center;
       justify-content:center;
       flex-direction:column;
-      font-size:18px;
-      transition:0.3s;
+      backface-visibility:hidden;
+      font-weight:bold;
     }
 
-    #card img {
-      width:100px;
+    /* BACK (YELLOW 🔥) */
+    .cardBack {
+      background:gold;
+      color:black;
     }
 
-    /* RARITIES */
+    /* FRONT */
+    .cardFront {
+      transform:rotateY(180deg);
+    }
+
+    .cardFront img {
+      width:90px;
+    }
+
+    /* RARITY GLOW */
     .Uncommon { background:#6b7280; }
     .Rare { background:#3b82f6; box-shadow:0 0 20px #3b82f6; }
     .Epic { background:#a855f7; box-shadow:0 0 25px #a855f7; }
-    .Legendary { background:#f59e0b; box-shadow:0 0 30px #f59e0b; }
-    .Chroma { background:linear-gradient(45deg,red,yellow,green,blue); }
-    .Mystical { background:gold; box-shadow:0 0 40px gold; }
+    .Legendary { background:#f59e0b; box-shadow:0 0 35px #f59e0b; animation:pulse 1s infinite; }
+    .Chroma { background:linear-gradient(45deg,red,yellow,green,blue); animation:pulse 1s infinite; }
+    .Mystical { background:gold; box-shadow:0 0 50px gold; animation:pulse 0.5s infinite; }
+
+    @keyframes pulse {
+      0%{transform:scale(1);}
+      50%{transform:scale(1.05);}
+      100%{transform:scale(1);}
+    }
 
     #flash {
       position:fixed;
-      top:0;
-      left:0;
       width:100%;
       height:100%;
       background:white;
@@ -121,11 +162,6 @@
     }
 
     .flash { opacity:0.8; }
-
-    /* INVENTORY */
-    #inventory {
-      margin-top:30px;
-    }
 
     .item {
       display:inline-block;
@@ -159,28 +195,40 @@
 
 <div id="topbar">
   <h1>Market</h1>
-  <div id="tokens">💰 100000</div>
+  <div id="tokens"></div>
 </div>
 
 <div class="grid">
   <div class="pack" onclick="openPack()">
-    <img src="https://picsum.photos/200/140?1">
+    <img src="https://picsum.photos/200/140?random=1">
     <div class="price">💰 25</div>
   </div>
 </div>
 
-<div id="inventory">
-  <h3>Inventory</h3>
-  <div id="items"></div>
-</div>
+<h3>Inventory</h3>
+<div id="items"></div>
 
 </div>
 
 <!-- OPEN SCREEN -->
 <div id="openScreen">
-  <div id="card"></div>
-  <h2 id="result"></h2>
-  <button onclick="closeOpen()">Close</button>
+
+<div class="cardWrap">
+  <div id="cardInner" class="cardInner">
+
+    <div class="cardFace cardBack">
+      FUNLET
+    </div>
+
+    <div id="cardFront" class="cardFace cardFront">
+    </div>
+
+  </div>
+</div>
+
+<h2 id="result"></h2>
+<button onclick="closeOpen()">Close</button>
+
 </div>
 
 <script>
@@ -210,51 +258,54 @@ function openPack(){
   if(tokens<25) return;
 
   tokens-=25;
-  document.getElementById("tokens").innerText="💰 "+tokens;
+  save();
 
   document.getElementById("openScreen").style.display="flex";
 
-  let card=document.getElementById("card");
+  let inner=document.getElementById("cardInner");
+  let front=document.getElementById("cardFront");
   let flash=document.getElementById("flash");
 
-  let spins=0;
+  inner.classList.remove("flip");
 
-  let interval=setInterval(()=>{
-    let rarity=getRarity();
-    let char=characters[rarity][0];
+  let rarity=getRarity();
+  let char=characters[rarity][0];
 
-    card.className=rarity;
-    card.innerHTML="<img src='"+char.img+"'><br>"+char.name;
+  front.className="cardFace cardFront "+rarity;
+  front.innerHTML="<img src='"+char.img+"'><br>"+char.name;
 
-    spins++;
+  setTimeout(()=>{
+    inner.classList.add("flip");
 
-    if(spins>10){
-      clearInterval(interval);
+    flash.classList.add("flash");
 
-      flash.classList.add("flash");
+    setTimeout(()=>{
+      flash.classList.remove("flash");
 
-      setTimeout(()=>{
-        flash.classList.remove("flash");
+      inventory.push(char);
+      updateInventory();
+      save();
 
-        inventory.push(char);
-        updateInventory();
+      document.getElementById("result").innerText=
+        "🎉 "+char.name+" ["+rarity+"]";
+    },200);
 
-        document.getElementById("result").innerText=
-          "🎉 "+char.name+" ["+rarity+"]";
-      },200);
-    }
+  },500);
 
-  },100);
+  updateTokens();
 }
 
 function closeOpen(){
   document.getElementById("openScreen").style.display="none";
 }
 
+function updateTokens(){
+  document.getElementById("tokens").innerText="💰 "+tokens;
+}
+
 function updateInventory(){
   let div=document.getElementById("items");
   div.innerHTML="";
-
   inventory.forEach(c=>{
     let d=document.createElement("div");
     d.className="item";
@@ -262,6 +313,25 @@ function updateInventory(){
     div.appendChild(d);
   });
 }
+
+/* SAVE SYSTEM 💾 */
+function save(){
+  localStorage.setItem("funletTokens",tokens);
+  localStorage.setItem("funletInv",JSON.stringify(inventory));
+}
+
+function load(){
+  let t=localStorage.getItem("funletTokens");
+  let i=localStorage.getItem("funletInv");
+
+  if(t) tokens=parseInt(t);
+  if(i) inventory=JSON.parse(i);
+
+  updateTokens();
+  updateInventory();
+}
+
+load();
 </script>
 
 </body>
