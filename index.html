@@ -1,128 +1,42 @@
-<div class="grid">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pack Opening</title>
+  <style>
+    body { text-align: center; font-family: Arial; background: #111; color: white; }
+    button { padding: 10px 20px; font-size: 18px; }
+    #result { margin-top: 20px; font-size: 24px; }
+  </style>
+</head>
+<body>
 
-  <div class="pack toy" onclick="openPack('toy', this)">
-    <div class="packArt">🧸</div>
-    <div class="packName">Toy Pack</div>
-    <div class="price">💰 25</div>
-  </div>
+<h1>Open a Pack</h1>
+<button onclick="openPack()">Open Pack</button>
 
-  <div class="pack sport" onclick="openPack('sport', this)">
-    <div class="packArt">🏀</div>
-    <div class="packName">Sport Pack</div>
-    <div class="price">💰 25</div>
-  </div>
+<div id="result"></div>
 
-  <div class="pack game" onclick="openPack('game', this)">
-    <div class="packArt">🎮</div>
-    <div class="packName">Game Pack</div>
-    <div class="price">💰 25</div>
-  </div>
+<script>
+const blooks = [
+  { name: "Common Cat", rarity: "Common", chance: 60 },
+  { name: "Dog", rarity: "Uncommon", chance: 25 },
+  { name: "Dragon", rarity: "Rare", chance: 10 },
+  { name: "Golden Mythic", rarity: "Mythic", chance: 5 }
+];
 
-  <div class="pack barbie" onclick="openPack('barbie', this)">
-    <div class="packArt">💖</div>
-    <div class="packName">Barbie Pack</div>
-    <div class="price">💰 25</div>
-  </div>
+function openPack() {
+  let rand = Math.random() * 100;
+  let total = 0;
 
-  <div class="pack ice" onclick="openPack('ice', this)">
-    <div class="packArt">❄️</div>
-    <div class="packName">Ice Pack</div>
-    <div class="price">💰 25</div>
-  </div>
-
-  <div class="pack summer" onclick="openPack('summer', this)">
-    <div class="packArt">🌴</div>
-    <div class="packName">Summer Pack</div>
-    <div class="price">💰 25</div>
-  </div>
-
-</div>
-.pack {
-  border-radius: 20px;
-  padding: 15px;
-  cursor: pointer;
-  transition: 0.2s;
-  text-align: center;
-  color: white;
-  font-weight: bold;
-  position: relative;
+  for (let blook of blooks) {
+    total += blook.chance;
+    if (rand <= total) {
+      document.getElementById("result").innerText =
+        `You got: ${blook.name} (${blook.rarity})`;
+      break;
+    }
+  }
 }
+</script>
 
-/* CARTOON COLORS */
-.toy { background: #f39c12; }
-.sport { background: #3498db; }
-.game { background: #2ecc71; }
-.barbie { background: #ff66cc; }
-.ice { background: #5dade2; }
-.summer { background: #f1c40f; }
-
-/* PACK ICON */
-.packArt {
-  font-size: 50px;
-  margin-bottom: 10px;
-}
-
-/* NAME */
-.packName {
-  font-size: 18px;
-}
-
-/* GLOW */
-.pack:hover {
-  transform: scale(1.07);
-  box-shadow: 0 0 25px white;
-}
-
-/* SHAKE ANIMATION */
-@keyframes shake {
-  0%{transform:translateX(0);}
-  25%{transform:translateX(-5px);}
-  50%{transform:translateX(5px);}
-  75%{transform:translateX(-5px);}
-  100%{transform:translateX(0);}
-}
-
-.shake {
-  animation: shake 0.3s;
-}function openPack(type, el){
-  if(tokens < 25) return;
-
-  // 🎁 SHAKE EFFECT
-  el.classList.add("shake");
-
-  setTimeout(()=>{
-    el.classList.remove("shake");
-
-    tokens -= 25;
-    updateTokens();
-
-    document.getElementById("openScreen").style.display="flex";
-
-    let card = document.getElementById("card");
-
-    let spins = 0;
-
-    let interval = setInterval(()=>{
-      let rarity = getRarity();
-      let list = packs[type][rarity];
-      let item = list[Math.floor(Math.random()*list.length)];
-
-      card.className = rarity;
-      card.innerText = item;
-
-      spins++;
-
-      if(spins > 12){
-        clearInterval(interval);
-
-        inventory.push(item);
-        updateInventory();
-
-        document.getElementById("result").innerText =
-          "🎉 " + item + " [" + rarity + "]";
-      }
-
-    },100);
-
-  },300);
-}
+</body>
+</html>
