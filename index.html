@@ -1,40 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Pack Opening</title>
+  <title>Blooket Style Pack</title>
   <style>
-    body { text-align: center; font-family: Arial; background: #111; color: white; }
-    button { padding: 10px 20px; font-size: 18px; }
-    #result { margin-top: 20px; font-size: 24px; }
+    body {
+      background: radial-gradient(circle, #1a1a1a, #000);
+      color: white;
+      font-family: Arial;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 30px;
+    }
+
+    #pack {
+      width: 200px;
+      margin: 50px auto;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    /* SHAKE ANIMATION */
+    .shake {
+      animation: shake 0.5s infinite;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(2px, 2px) rotate(0deg); }
+      25% { transform: translate(-2px, -3px) rotate(-1deg); }
+      50% { transform: translate(2px, 3px) rotate(1deg); }
+      75% { transform: translate(-1px, -2px) rotate(-1deg); }
+      100% { transform: translate(2px, 2px) rotate(0deg); }
+    }
+
+    /* RESULT CARD */
+    #card {
+      width: 220px;
+      height: 260px;
+      margin: auto;
+      border-radius: 15px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 20px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    /* GLOW COLORS */
+    .common { box-shadow: 0 0 10px gray; background: #444; }
+    .uncommon { box-shadow: 0 0 15px lime; background: #145214; }
+    .rare { box-shadow: 0 0 20px deepskyblue; background: #00334d; }
+    .epic { box-shadow: 0 0 25px purple; background: #2d0033; }
+    .legendary { box-shadow: 0 0 30px gold; background: #665500; }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: orange;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-<h1>Open a Pack</h1>
-<button onclick="openPack()">Open Pack</button>
+<h1>🎁 Open Pack</h1>
 
-<div id="result"></div>
+<img id="pack" src="https://i.imgur.com/6X12UGC.png">
+
+<br>
+<button onclick="openPack()">Open</button>
+
+<div id="card"></div>
 
 <script>
 const blooks = [
-  { name: "Common Cat", rarity: "Common", chance: 60 },
-  { name: "Dog", rarity: "Uncommon", chance: 25 },
-  { name: "Dragon", rarity: "Rare", chance: 10 },
-  { name: "Golden Mythic", rarity: "Mythic", chance: 5 }
+  { name: "Cat", rarity: "common", chance: 40 },
+  { name: "Dog", rarity: "uncommon", chance: 30 },
+  { name: "Dragon", rarity: "rare", chance: 15 },
+  { name: "Galaxy Owl", rarity: "epic", chance: 10 },
+  { name: "Golden King", rarity: "legendary", chance: 5 }
 ];
 
 function openPack() {
-  let rand = Math.random() * 100;
-  let total = 0;
+  const pack = document.getElementById("pack");
+  const card = document.getElementById("card");
 
-  for (let blook of blooks) {
-    total += blook.chance;
-    if (rand <= total) {
-      document.getElementById("result").innerText =
-        `You got: ${blook.name} (${blook.rarity})`;
-      break;
+  card.style.display = "none";
+
+  // START SHAKE
+  pack.classList.add("shake");
+
+  setTimeout(() => {
+    pack.classList.remove("shake");
+
+    // RNG
+    let rand = Math.random() * 100;
+    let total = 0;
+    let result;
+
+    for (let b of blooks) {
+      total += b.chance;
+      if (rand <= total) {
+        result = b;
+        break;
+      }
     }
-  }
+
+    // SHOW RESULT
+    card.style.display = "flex";
+    card.className = "";
+    card.classList.add(result.rarity);
+    card.innerHTML = `
+      <div>${result.name}</div>
+      <div style="font-size:14px;">${result.rarity.toUpperCase()}</div>
+    `;
+
+  }, 1500);
 }
 </script>
 
