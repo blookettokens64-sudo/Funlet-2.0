@@ -5,143 +5,112 @@
 
   <style>
     body {
+      margin: 0;
       font-family: Arial;
-      background: linear-gradient(to right, #1e1e2f, #2c2c54);
+      background: #0f172a;
       color: white;
       text-align: center;
     }
 
-    .box {
-      background: #2f2f4f;
-      padding: 15px;
-      border-radius: 15px;
-      margin: 15px auto;
-      width: 320px;
-      box-shadow: 0 0 15px black;
+    h1 {
+      margin-top: 10px;
     }
 
-    .packs {
+    #topbar {
+      background: #1e293b;
+      padding: 10px;
+      font-size: 20px;
+    }
+
+    #packs {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      margin-top: 30px;
+      gap: 20px;
     }
 
     .pack {
+      width: 120px;
+      height: 160px;
+      background: #334155;
+      border-radius: 15px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
       transition: 0.2s;
     }
 
     .pack:hover {
       transform: scale(1.1);
+      background: #475569;
     }
 
-    .pack img {
-      width: 100px;
-      border-radius: 10px;
+    #openArea {
+      margin-top: 40px;
     }
 
-    #animation {
-      font-size: 25px;
-      height: 40px;
-      margin-top: 10px;
+    #card {
+      width: 200px;
+      height: 250px;
+      background: #1e293b;
+      border-radius: 20px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: 0.3s;
     }
 
-    .Uncommon { color: gray; }
-    .Rare { color: blue; }
-    .Epic { color: purple; }
-    .Legendary { color: orange; }
+    .Uncommon { background: #6b7280; }
+    .Rare { background: #3b82f6; }
+    .Epic { background: #a855f7; }
+    .Legendary { background: #f59e0b; }
+    .Chroma { background: linear-gradient(45deg, red, yellow, green, blue); }
+    .Mystical { background: gold; }
 
-    .Chroma {
-      animation: rainbow 1s infinite;
+    #inventory {
+      margin-top: 40px;
     }
 
-    .Mystical {
-      color: gold;
-      font-size: 30px;
-      text-shadow: 0 0 15px gold;
-    }
-
-    @keyframes rainbow {
-      0%{color:red;}25%{color:yellow;}50%{color:green;}75%{color:blue;}100%{color:purple;}
-    }
-
-    li {
-      background: #444;
+    .item {
+      display: inline-block;
+      padding: 10px;
       margin: 5px;
-      padding: 5px;
-      border-radius: 8px;
-      list-style: none;
-    }
-
-    input {
-      padding: 8px;
-      border-radius: 8px;
-      border: none;
+      border-radius: 10px;
+      background: #334155;
     }
   </style>
 </head>
 
 <body>
 
+<div id="topbar">
+  💰 Tokens: <span id="tokens">100000</span>
+</div>
+
 <h1>🎮 Funlet</h1>
 
-<div class="box">
-  <h2>💰 Tokens: <span id="tokens"></span></h2>
-
-  <div class="packs">
-    <div class="pack" onclick="openPack('toy')">
-      <img src="https://via.placeholder.com/100?text=Toy">
-    </div>
-
-    <div class="pack" onclick="openPack('sport')">
-      <img src="https://via.placeholder.com/100?text=Sport">
-    </div>
-  </div>
-
-  <div id="animation"></div>
-  <h3 id="result"></h3>
+<div id="packs">
+  <div class="pack" onclick="openPack()">Toy</div>
+  <div class="pack" onclick="openPack()">Sport</div>
 </div>
 
-<div class="box">
-  <h3>🎒 Inventory (click to sell)</h3>
-  <ul id="items"></ul>
+<div id="openArea">
+  <div id="card">Click a Pack</div>
+  <h2 id="result"></h2>
 </div>
 
-<div class="box">
-  <h3>🏪 Auction House</h3>
-  <ul id="auction"></ul>
-</div>
-
-<div class="box">
-  <h3>💬 Chat</h3>
-  <ul id="chat"></ul>
-  <input id="chatInput">
-  <button onclick="sendMessage()">Send</button>
+<div id="inventory">
+  <h3>🎒 Inventory</h3>
+  <div id="items"></div>
 </div>
 
 <script>
 let tokens = 100000;
 let inventory = [];
-let auction = [];
-
-const packs = {
-  toy: {
-    Uncommon:["Toy Car"],
-    Rare:["Lego"],
-    Epic:["Robot"],
-    Legendary:["Mega Toy"],
-    Chroma:["Rainbow Toy"],
-    Mystical:["Golden Toy"]
-  },
-  sport: {
-    Uncommon:["Ball"],
-    Rare:["Basketball"],
-    Epic:["Gear"],
-    Legendary:["Jersey"],
-    Chroma:["Neon Ball"],
-    Mystical:["Trophy"]
-  }
-};
 
 function getRarity(){
   let r=Math.random()*100;
@@ -153,128 +122,61 @@ function getRarity(){
   return "Uncommon";
 }
 
-function openPack(type){
-  if(tokens<20) return;
+const itemsByRarity = {
+  Uncommon:["Toy","Ball"],
+  Rare:["Lego","Basketball"],
+  Epic:["Robot","Gear"],
+  Legendary:["Mega Toy","Jersey"],
+  Chroma:["Rainbow Toy"],
+  Mystical:["Golden Toy"]
+};
 
-  tokens-=20;
-  updateTokens();
+function openPack(){
+  if(tokens < 20) return;
 
-  let rarity=getRarity();
-  let reward=packs[type][rarity][0];
+  tokens -= 20;
+  document.getElementById("tokens").innerText = tokens;
 
-  let anim=document.getElementById("animation");
-  let i=0;
+  let card = document.getElementById("card");
+  card.innerText = "Opening...";
+  card.className = "";
 
-  let spin=setInterval(()=>{
-    anim.innerText="Opening...";
-    i++;
-    if(i>10){
-      clearInterval(spin);
-      anim.innerText=reward;
-      anim.className=rarity;
+  let spins = 0;
 
-      inventory.push(reward);
+  let interval = setInterval(()=>{
+    let rarity = getRarity();
+    let item = itemsByRarity[rarity][0];
+
+    card.innerText = item;
+    card.className = rarity;
+
+    spins++;
+
+    if(spins > 10){
+      clearInterval(interval);
+
+      inventory.push(item);
+
+      document.getElementById("result").innerText =
+        "🎉 You got " + item + " [" + rarity + "]";
+
       updateInventory();
-
-      document.getElementById("result").innerText=
-        "🎉 "+reward+" ["+rarity+"]";
-
-      addChat("SYSTEM","Someone got "+reward+" ["+rarity+"]!");
     }
-  },100);
-}
 
-function updateTokens(){
-  document.getElementById("tokens").innerText=tokens;
+  }, 100);
 }
 
 function updateInventory(){
-  let list=document.getElementById("items");
-  list.innerHTML="";
+  let div = document.getElementById("items");
+  div.innerHTML = "";
 
-  inventory.forEach((item,i)=>{
-    let li=document.createElement("li");
-    li.innerText=item+" (click to sell)";
-    li.onclick=()=>{
-      let price=Math.floor(Math.random()*1000)+50;
-      auction.push({name:item,price:price,time:20});
-      inventory.splice(i,1);
-      updateInventory();
-      updateAuction();
-    };
-    list.appendChild(li);
+  inventory.forEach(item=>{
+    let d = document.createElement("div");
+    d.className = "item";
+    d.innerText = item;
+    div.appendChild(d);
   });
 }
-
-function updateAuction(){
-  let list=document.getElementById("auction");
-  list.innerHTML="";
-
-  auction.forEach((item,i)=>{
-    let li=document.createElement("li");
-    li.innerText=item.name+" 💰"+item.price+" ⏱️"+item.time;
-
-    li.onclick=()=>{
-      if(tokens<item.price) return;
-
-      tokens-=item.price;
-      inventory.push(item.name);
-
-      auction.splice(i,1);
-      updateTokens();
-      updateInventory();
-      updateAuction();
-
-      addChat("SYSTEM","You bought "+item.name);
-    };
-
-    list.appendChild(li);
-  });
-}
-
-// countdown
-setInterval(()=>{
-  auction.forEach(a=>a.time--);
-  auction=auction.filter(a=>a.time>0);
-  updateAuction();
-},1000);
-
-// bots
-setInterval(()=>{
-  let items=["Golden Toy","Neon Ball","Mega Toy"];
-  let item=items[Math.floor(Math.random()*items.length)];
-  let price=Math.floor(Math.random()*2000)+50;
-
-  auction.push({name:item,price:price,time:20});
-  updateAuction();
-
-  addChat("SYSTEM","New auction: "+item+" 💰"+price);
-},4000);
-
-// chat
-function sendMessage(){
-  let msg=document.getElementById("chatInput").value;
-  if(!msg) return;
-  addChat("You",msg);
-  document.getElementById("chatInput").value="";
-}
-
-function addChat(user,msg){
-  let li=document.createElement("li");
-  li.innerText=user+": "+msg;
-  document.getElementById("chat").appendChild(li);
-}
-
-// fake chat
-setInterval(()=>{
-  let names=["Pro","Noob","Trader","Legend"];
-  let msgs=["hi","anyone here?","I got legendary!","lol"];
-
-  addChat(names[Math.floor(Math.random()*names.length)],
-          msgs[Math.floor(Math.random()*msgs.length)]);
-},3000);
-
-updateTokens();
 </script>
 
 </body>
