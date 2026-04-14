@@ -1,216 +1,308 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Blooket Style Game</title>
+  <title>Funlet</title>
+
   <style>
     body {
-      background: radial-gradient(circle, #111, #000);
-      color: white;
-      font-family: Arial;
-      text-align: center;
+      margin:0;
+      font-family:Arial;
+      display:flex;
+      background:#3cc0d0;
     }
 
-    h1 { margin-top: 20px; }
-
-    button {
-      padding: 10px 20px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      background: orange;
-      cursor: pointer;
-      margin: 5px;
+    /* SIDEBAR */
+    #sidebar {
+      width:200px;
+      background:#8e44ad;
+      color:white;
+      height:100vh;
+      padding:20px;
     }
 
-    #pack {
-      width: 180px;
-      margin: 20px;
+    .tabBtn {
+      padding:10px;
+      margin:8px 0;
+      border-radius:10px;
+      cursor:pointer;
     }
 
-    .shake {
-      animation: shake 0.5s infinite;
+    .active { background:white; color:black; }
+
+    /* MAIN */
+    #main {
+      flex:1;
+      padding:20px;
+      text-align:center;
     }
 
-    @keyframes shake {
-      0% { transform: translate(2px,2px); }
-      25% { transform: translate(-2px,-3px); }
-      50% { transform: translate(2px,3px); }
-      75% { transform: translate(-1px,-2px); }
-      100% { transform: translate(2px,2px); }
+    #tokens {
+      background:#8e44ad;
+      padding:10px;
+      border-radius:10px;
+      float:right;
+    }
+
+    .tab {
+      display:none;
+    }
+
+    .show {
+      display:block;
+    }
+
+    /* GRID */
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(3,200px);
+      gap:20px;
+      justify-content:center;
+      margin-top:20px;
+    }
+
+    .pack {
+      border-radius:20px;
+      padding:15px;
+      cursor:pointer;
+      color:white;
+      font-weight:bold;
+    }
+
+    .toy { background:#f39c12; }
+    .sport { background:#3498db; }
+    .game { background:#2ecc71; }
+    .barbie { background:#ff66cc; }
+    .ice { background:#5dade2; }
+    .summer { background:#f1c40f; }
+
+    .pack:hover { transform:scale(1.05); }
+
+    .packArt { font-size:50px; }
+
+    .price {
+      background:#00000033;
+      padding:5px;
+      border-radius:10px;
+      margin-top:10px;
+    }
+
+    /* CARD */
+    #openScreen {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:black;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
     }
 
     #card {
-      width: 220px;
-      height: 260px;
-      margin: auto;
-      border-radius: 15px;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      font-size: 22px;
-      font-weight: bold;
+      width:200px;
+      height:250px;
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:40px;
+      color:white;
     }
 
-    .common { background:#444; box-shadow:0 0 10px gray; }
-    .uncommon { background:#145214; box-shadow:0 0 15px lime; }
-    .rare { background:#00334d; box-shadow:0 0 20px cyan; }
-    .epic { background:#2d0033; box-shadow:0 0 25px purple; }
-    .legendary { background:#665500; box-shadow:0 0 35px gold; animation: glow 1s infinite alternate; }
+    .Uncommon { background:#6b7280; }
+    .Rare { background:#3b82f6; }
+    .Epic { background:#a855f7; }
+    .Legendary { background:#f59e0b; }
+    .Chroma { background:linear-gradient(45deg,red,yellow,green,blue); }
+    .Mystical { background:gold; color:black; }
 
-    @keyframes glow {
-      from { box-shadow: 0 0 20px gold; }
-      to { box-shadow: 0 0 50px yellow; }
+    /* INVENTORY */
+    .item {
+      display:inline-block;
+      margin:5px;
+      padding:10px;
+      border-radius:10px;
+      background:#334155;
+      font-size:20px;
     }
 
-    #shop, #game {
-      display: none;
+    /* AUCTION */
+    .auctionItem {
+      background:white;
+      color:black;
+      padding:10px;
+      margin:10px;
+      border-radius:10px;
     }
 
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-    }
   </style>
 </head>
+
 <body>
 
-<h1>🎮 Blook Game</h1>
+<div id="sidebar">
+  <h2>Funlet</h2>
 
-<div id="menu">
-  <button onclick="startGame()">Play</button>
+  <div class="tabBtn active" onclick="switchTab('market', this)">Market</div>
+  <div class="tabBtn" onclick="switchTab('blooks', this)">Blooks</div>
+  <div class="tabBtn" onclick="switchTab('auction', this)">Auction</div>
+  <div class="tabBtn" onclick="switchTab('news', this)">News</div>
 </div>
 
-<div id="game">
-  <h2>💰 Coins: <span id="coins">100</span></h2>
-  <button onclick="goShop()">🛒 Shop</button>
+<div id="main">
+
+<div id="tokens"></div>
+
+<!-- MARKET -->
+<div id="market" class="tab show">
+
+<h1>Market</h1>
+
+<div class="grid">
+
+  <div class="pack toy" onclick="openPack('toy')">
+    <div class="packArt">🧸</div>
+    Toy Pack
+    <div class="price">💰 25</div>
+  </div>
+
+  <div class="pack sport" onclick="openPack('sport')">
+    <div class="packArt">🏀</div>
+    Sport Pack
+    <div class="price">💰 25</div>
+  </div>
+
+  <div class="pack game" onclick="openPack('game')">
+    <div class="packArt">🎮</div>
+    Game Pack
+    <div class="price">💰 25</div>
+  </div>
+
 </div>
 
-<div id="shop">
-  <h2>🎁 Pack Shop (Cost: 20)</h2>
-  <img id="pack" src="https://i.imgur.com/6X12UGC.png">
-  <br>
-  <button onclick="openPack()">Open Pack</button>
-  <br><br>
-  <button onclick="back()">⬅ Back</button>
 </div>
 
-<div id="card"></div>
-<canvas id="confetti"></canvas>
+<!-- BLOOKS -->
+<div id="blooks" class="tab">
+  <h1>Your Blooks</h1>
+  <div id="inventory"></div>
+</div>
+
+<!-- AUCTION -->
+<div id="auction" class="tab">
+  <h1>Auction</h1>
+  <div id="auctionList"></div>
+</div>
+
+<!-- NEWS -->
+<div id="news" class="tab">
+  <h1>News</h1>
+  <p>🔥 Welcome to Funlet!</p>
+  <p>New packs coming soon!</p>
+</div>
+
+</div>
+
+<!-- OPEN SCREEN -->
+<div id="openScreen">
+  <div id="card">?</div>
+  <h2 id="result"></h2>
+  <button onclick="closeOpen()">Close</button>
+</div>
 
 <script>
-let coins = 100;
+let tokens=100000;
+let inventory=[];
 
-const blooks = [
-  { name: "Cat", rarity: "common", chance: 40 },
-  { name: "Dog", rarity: "uncommon", chance: 30 },
-  { name: "Dragon", rarity: "rare", chance: 15 },
-  { name: "Galaxy Owl", rarity: "epic", chance: 10 },
-  { name: "Golden King", rarity: "legendary", chance: 5 }
-];
+const packs={
+  toy:{Uncommon:["🧸"],Rare:["🤖"],Epic:["🛸"],Legendary:["🦖"],Chroma:["🌈🧸"],Mystical:["👑🧸"]},
+  sport:{Uncommon:["🏀"],Rare:["🏈"],Epic:["🏆"],Legendary:["🥇"],Chroma:["🌈🏀"],Mystical:["👑🏆"]},
+  game:{Uncommon:["🎮"],Rare:["🕹️"],Epic:["💻"],Legendary:["👾"],Chroma:["🌈👾"],Mystical:["👑👾"]}
+};
 
-function updateCoins() {
-  document.getElementById("coins").innerText = coins;
+function switchTab(tab, el){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("show"));
+  document.getElementById(tab).classList.add("show");
+
+  document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
 }
 
-function startGame() {
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("game").style.display = "block";
-  updateCoins();
+function getRarity(){
+  let r=Math.random()*100;
+  if(r<0.001) return "Mystical";
+  if(r<0.02) return "Chroma";
+  if(r<0.5) return "Legendary";
+  if(r<3) return "Epic";
+  if(r<15) return "Rare";
+  return "Uncommon";
 }
 
-function goShop() {
-  document.getElementById("game").style.display = "none";
-  document.getElementById("shop").style.display = "block";
-}
+function openPack(type){
+  if(tokens<25) return;
 
-function back() {
-  document.getElementById("shop").style.display = "none";
-  document.getElementById("game").style.display = "block";
-}
+  tokens-=25;
+  updateTokens();
 
-function openPack() {
-  if (coins < 20) {
-    alert("Not enough coins!");
-    return;
-  }
+  document.getElementById("openScreen").style.display="flex";
 
-  coins -= 20;
-  updateCoins();
+  let card=document.getElementById("card");
+  let spins=0;
 
-  const pack = document.getElementById("pack");
-  const card = document.getElementById("card");
+  let interval=setInterval(()=>{
+    let rarity=getRarity();
+    let list=packs[type][rarity];
+    let item=list[Math.floor(Math.random()*list.length)];
 
-  card.style.display = "none";
-  pack.classList.add("shake");
+    card.className=rarity;
+    card.innerText=item;
 
-  playSound();
+    spins++;
 
-  setTimeout(() => {
-    pack.classList.remove("shake");
+    if(spins>12){
+      clearInterval(interval);
 
-    let rand = Math.random() * 100;
-    let total = 0;
-    let result;
+      inventory.push(item);
+      updateInventory();
+      addAuction(item);
 
-    for (let b of blooks) {
-      total += b.chance;
-      if (rand <= total) {
-        result = b;
-        break;
-      }
+      document.getElementById("result").innerText=
+        "🎉 "+item+" ["+rarity+"]";
     }
 
-    card.style.display = "flex";
-    card.className = result.rarity;
-    card.innerHTML = result.name + "<br>" + result.rarity.toUpperCase();
-
-    if (result.rarity === "legendary") {
-      launchConfetti();
-    }
-
-  }, 1500);
+  },100);
 }
 
-// SOUND
-function playSound() {
-  const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
-  audio.play();
+function closeOpen(){
+  document.getElementById("openScreen").style.display="none";
 }
 
-// CONFETTI
-function launchConfetti() {
-  const canvas = document.getElementById("confetti");
-  const ctx = canvas.getContext("2d");
-
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  let pieces = [];
-
-  for (let i = 0; i < 100; i++) {
-    pieces.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      dy: Math.random() * 5 + 2
-    });
-  }
-
-  function update() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (let p of pieces) {
-      p.y += p.dy;
-      ctx.fillRect(p.x, p.y, 5, 5);
-    }
-
-    requestAnimationFrame(update);
-  }
-
-  update();
+function updateTokens(){
+  document.getElementById("tokens").innerText="💰 "+tokens;
 }
+
+function updateInventory(){
+  let div=document.getElementById("inventory");
+  div.innerHTML="";
+  inventory.forEach(i=>{
+    let d=document.createElement("div");
+    d.className="item";
+    d.innerText=i;
+    div.appendChild(d);
+  });
+}
+
+/* SIMPLE AUCTION */
+function addAuction(item){
+  let div=document.createElement("div");
+  div.className="auctionItem";
+  div.innerText=item+" - Bid: 100";
+  document.getElementById("auctionList").appendChild(div);
+}
+
+updateTokens();
 </script>
 
 </body>
