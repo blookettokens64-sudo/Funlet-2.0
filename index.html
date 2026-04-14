@@ -4,12 +4,8 @@
   <title>Funlet</title>
 
   <style>
-    body {
-      margin:0;
-      font-family:Arial;
-      display:flex;
-      background:#3cc0d0;
-    }
+    body <div id="flash"></div>
+
 
     #sidebar {
       width:200px;
@@ -121,7 +117,52 @@
       background:#334155;
       font-size:20px;
     }
-  </style>
+  </style>/* SHAKE */
+@keyframes shake {
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  50%{transform:translateX(6px);}
+  75%{transform:translateX(-6px);}
+  100%{transform:translateX(0);}
+}
+.shake { animation:shake 0.3s; }
+
+/* FLASH */
+#flash {
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:white;
+  opacity:0;
+  pointer-events:none;
+}
+.flash { opacity:0.8; }
+
+/* RARITY EFFECTS */
+.Legendary { box-shadow:0 0 30px gold; }
+.Chroma { animation:rainbow 1s infinite; }
+.Mystical { animation:pulse 0.5s infinite; }
+
+@keyframes rainbow {
+  0%{filter:hue-rotate(0deg);}
+  100%{filter:hue-rotate(360deg);}
+}
+
+@keyframes pulse {
+  0%{transform:scale(1);}
+  50%{transform:scale(1.1);}
+  100%{transform:scale(1);}
+}
+
+/* LOCKED PACK */
+.locked {
+  opacity:0.4;
+  cursor:not-allowed;
+}
+.countdown {
+  font-size:12px;
+  margin-top:5px;
+}
 </head>
 
 <body>
@@ -309,7 +350,27 @@ function updateInventory(){
 
 updateTokens();
 loadPacks();
-</script>
+</script>function loadPacks(){
+  let grid=document.getElementById("packGrid");
+  grid.innerHTML="";
+
+  let available = ["toy","sport","game"];
+
+  available.forEach(p=>{
+    let div=document.createElement("div");
+    div.className="pack "+p;
+
+    div.innerHTML=`
+      <div class="packArt">${getIcon(p)}</div>
+      ${p.toUpperCase()} PACK
+      <div class="price">💰 25</div>
+    `;
+
+    div.onclick=()=>openPack(p, div);
+
+    grid.appendChild(div);
+  });
+}
 
 </body>
 </html>
