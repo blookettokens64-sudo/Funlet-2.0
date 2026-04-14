@@ -11,7 +11,6 @@
       background:#3cc0d0;
     }
 
-    /* SIDEBAR */
     #sidebar {
       width:200px;
       background:#8e44ad;
@@ -29,7 +28,6 @@
 
     .active { background:white; color:black; }
 
-    /* MAIN */
     #main {
       flex:1;
       padding:20px;
@@ -43,15 +41,9 @@
       float:right;
     }
 
-    .tab {
-      display:none;
-    }
+    .tab { display:none; }
+    .show { display:block; }
 
-    .show {
-      display:block;
-    }
-
-    /* GRID */
     .grid {
       display:grid;
       grid-template-columns:repeat(3,200px);
@@ -68,13 +60,6 @@
       font-weight:bold;
     }
 
-    .toy { background:#f39c12; }
-    .sport { background:#3498db; }
-    .game { background:#2ecc71; }
-    .barbie { background:#ff66cc; }
-    .ice { background:#5dade2; }
-    .summer { background:#f1c40f; }
-
     .pack:hover { transform:scale(1.05); }
 
     .packArt { font-size:50px; }
@@ -86,7 +71,17 @@
       margin-top:10px;
     }
 
-    /* CARD */
+    /* COLORS */
+    .toy { background:#f39c12; }
+    .sport { background:#3498db; }
+    .game { background:#2ecc71; }
+    .spooky { background:#8e44ad; }
+    .autumn { background:#d35400; }
+    .blizzard { background:#5dade2; }
+    .lovely { background:#ff66cc; }
+    .lucky { background:#27ae60; }
+    .spring { background:#f1c40f; }
+
     #openScreen {
       position:fixed;
       top:0;
@@ -118,7 +113,6 @@
     .Chroma { background:linear-gradient(45deg,red,yellow,green,blue); }
     .Mystical { background:gold; color:black; }
 
-    /* INVENTORY */
     .item {
       display:inline-block;
       margin:5px;
@@ -127,16 +121,6 @@
       background:#334155;
       font-size:20px;
     }
-
-    /* AUCTION */
-    .auctionItem {
-      background:white;
-      color:black;
-      padding:10px;
-      margin:10px;
-      border-radius:10px;
-    }
-
   </style>
 </head>
 
@@ -144,7 +128,6 @@
 
 <div id="sidebar">
   <h2>Funlet</h2>
-
   <div class="tabBtn active" onclick="switchTab('market', this)">Market</div>
   <div class="tabBtn" onclick="switchTab('blooks', this)">Blooks</div>
   <div class="tabBtn" onclick="switchTab('auction', this)">Auction</div>
@@ -152,36 +135,12 @@
 </div>
 
 <div id="main">
-
 <div id="tokens"></div>
 
 <!-- MARKET -->
 <div id="market" class="tab show">
-
-<h1>Market</h1>
-
-<div class="grid">
-
-  <div class="pack toy" onclick="openPack('toy')">
-    <div class="packArt">🧸</div>
-    Toy Pack
-    <div class="price">💰 25</div>
-  </div>
-
-  <div class="pack sport" onclick="openPack('sport')">
-    <div class="packArt">🏀</div>
-    Sport Pack
-    <div class="price">💰 25</div>
-  </div>
-
-  <div class="pack game" onclick="openPack('game')">
-    <div class="packArt">🎮</div>
-    Game Pack
-    <div class="price">💰 25</div>
-  </div>
-
-</div>
-
+  <h1>Market</h1>
+  <div class="grid" id="packGrid"></div>
 </div>
 
 <!-- BLOOKS -->
@@ -193,19 +152,17 @@
 <!-- AUCTION -->
 <div id="auction" class="tab">
   <h1>Auction</h1>
-  <div id="auctionList"></div>
+  <p>Items you pull will show here soon 👀</p>
 </div>
 
 <!-- NEWS -->
 <div id="news" class="tab">
   <h1>News</h1>
-  <p>🔥 Welcome to Funlet!</p>
-  <p>New packs coming soon!</p>
+  <p>🔥 Seasonal packs added!</p>
 </div>
 
 </div>
 
-<!-- OPEN SCREEN -->
 <div id="openScreen">
   <div id="card">?</div>
   <h2 id="result"></h2>
@@ -213,15 +170,25 @@
 </div>
 
 <script>
-let tokens=100000;
-let inventory=[];
+let tokens = 100000;
+let inventory = [];
 
-const packs={
+/* PACK DATA */
+const packs = {
   toy:{Uncommon:["🧸"],Rare:["🤖"],Epic:["🛸"],Legendary:["🦖"],Chroma:["🌈🧸"],Mystical:["👑🧸"]},
   sport:{Uncommon:["🏀"],Rare:["🏈"],Epic:["🏆"],Legendary:["🥇"],Chroma:["🌈🏀"],Mystical:["👑🏆"]},
-  game:{Uncommon:["🎮"],Rare:["🕹️"],Epic:["💻"],Legendary:["👾"],Chroma:["🌈👾"],Mystical:["👑👾"]}
+  game:{Uncommon:["🎮"],Rare:["🕹️"],Epic:["💻"],Legendary:["👾"],Chroma:["🌈👾"],Mystical:["👑👾"]},
+
+  spooky:{Uncommon:["🎃"],Rare:["👻"],Epic:["🕷️"],Legendary:["💀"],Chroma:["🌈🎃"],Mystical:["👑🎃"]},
+  autumn:{Uncommon:["🍂"],Rare:["🍁"],Epic:["🌰"],Legendary:["🦃"],Chroma:["🌈🍂"],Mystical:["👑🍂"]},
+  blizzard:{Uncommon:["❄️"],Rare:["⛄"],Epic:["🧊"],Legendary:["🌨️"],Chroma:["🌈❄️"],Mystical:["👑❄️"]},
+
+  lovely:{Uncommon:["💖"],Rare:["🌹"],Epic:["💘"],Legendary:["❤️"],Chroma:["🌈💖"],Mystical:["👑💖"]},
+  lucky:{Uncommon:["🍀"],Rare:["🌈"],Epic:["💰"],Legendary:["🪙"],Chroma:["🌈🍀"],Mystical:["👑🍀"]},
+  spring:{Uncommon:["🌸"],Rare:["🐣"],Epic:["🥚"],Legendary:["🐰"],Chroma:["🌈🌸"],Mystical:["👑🌸"]}
 };
 
+/* TABS */
 function switchTab(tab, el){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("show"));
   document.getElementById(tab).classList.add("show");
@@ -230,6 +197,7 @@ function switchTab(tab, el){
   el.classList.add("active");
 }
 
+/* RARITY */
 function getRarity(){
   let r=Math.random()*100;
   if(r<0.001) return "Mystical";
@@ -240,6 +208,53 @@ function getRarity(){
   return "Uncommon";
 }
 
+/* TIME BASED PACKS */
+function getAvailablePacks(){
+  let m = new Date().getMonth();
+  let d = new Date();
+
+  let list = ["toy","sport","game"];
+
+  if(m===9) list.push("spooky");
+  if(m===10) list.push("autumn");
+  if(m===11) list.push("blizzard");
+
+  if(m===1 && d.getDate()===14) list.push("lovely");
+  if(m===2 && d.getDate()===17) list.push("lucky");
+  if(m===3) list.push("spring");
+
+  return list;
+}
+
+/* LOAD PACKS */
+function loadPacks(){
+  let grid=document.getElementById("packGrid");
+  grid.innerHTML="";
+
+  getAvailablePacks().forEach(p=>{
+    let div=document.createElement("div");
+    div.className="pack "+p;
+
+    div.innerHTML=`
+      <div class="packArt">${getIcon(p)}</div>
+      ${p.toUpperCase()} PACK
+      <div class="price">💰 25</div>
+    `;
+
+    div.onclick=()=>openPack(p);
+    grid.appendChild(div);
+  });
+}
+
+function getIcon(p){
+  return {
+    toy:"🧸",sport:"🏀",game:"🎮",
+    spooky:"🎃",autumn:"🍂",blizzard:"❄️",
+    lovely:"💖",lucky:"🍀",spring:"🌸"
+  }[p];
+}
+
+/* OPEN PACK */
 function openPack(type){
   if(tokens<25) return;
 
@@ -253,8 +268,7 @@ function openPack(type){
 
   let interval=setInterval(()=>{
     let rarity=getRarity();
-    let list=packs[type][rarity];
-    let item=list[Math.floor(Math.random()*list.length)];
+    let item=packs[type][rarity][0];
 
     card.className=rarity;
     card.innerText=item;
@@ -266,7 +280,6 @@ function openPack(type){
 
       inventory.push(item);
       updateInventory();
-      addAuction(item);
 
       document.getElementById("result").innerText=
         "🎉 "+item+" ["+rarity+"]";
@@ -294,15 +307,8 @@ function updateInventory(){
   });
 }
 
-/* SIMPLE AUCTION */
-function addAuction(item){
-  let div=document.createElement("div");
-  div.className="auctionItem";
-  div.innerText=item+" - Bid: 100";
-  document.getElementById("auctionList").appendChild(div);
-}
-
 updateTokens();
+loadPacks();
 </script>
 
 </body>
