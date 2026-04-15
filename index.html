@@ -1,376 +1,66 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Funlet</title>
+// --- FUNLET CORE DATA ENGINE ---
 
-  <style>
-    body <div id="flash"></div>
+// Initialize user data (Tokens, Blooks, Stats)
+if (!localStorage.getItem('funletUser')) {
+    localStorage.setItem('funletUser', JSON.stringify({
+        tokens: 0,
+        blooks: ['DefaultBlook'], // Starts with one
+        equippedBlook: 'DefaultBlook',
+        stats: { questionsAnswered: 0 }
+    }));
+}
 
+// Initialize question sets
+if (!localStorage.getItem('funletSets')) {
+    localStorage.setItem('funletSets', JSON.stringify([]));
+}
 
-    #sidebar {
-      width:200px;
-      background:#8e44ad;
-      color:white;
-      height:100vh;
-      padding:20px;
+// Load User Data
+const getUser = () => JSON.parse(localStorage.getItem('funletUser'));
+const getSets = () => JSON.parse(localStorage.getItem('funletSets'));
+
+// --- FUNCTIONS FOR "BETTER THAN BLOOKET" FEATURES ---
+
+// 1. Better Creation: Add new question set
+function createSet(title, questions) {
+    const sets = getSets();
+    const newSet = {
+        id: Date.now(), // Unique ID
+        title: title,
+        questions: questions, // Array of {q, a1, a2, a3, a4, correct, time}
+        createdAt: new Date().toLocaleDateString()
+    };
+    sets.push(newSet);
+    localStorage.setItem('funletSets', JSON.stringify(sets));
+    return newSet;
+}
+
+// 2. The Market (Buying Blooks)
+function buyBlookPack(packName, cost) {
+    let user = getUser();
+    if (user.tokens >= cost) {
+        user.tokens -= cost;
+        // Logic to add a random blook from the pack to user.blooks
+        localStorage.setItem('funletUser', JSON.stringify(user));
+        return { success: true, blook: "NewBlook" };
     }
-
-    .tabBtn {
-      padding:10px;
-      margin:8px 0;
-      border-radius:10px;
-      cursor:pointer;
-    }
-
-    .active { background:white; color:black; }
-
-    #main {
-      flex:1;
-      padding:20px;
-      text-align:center;
-    }
-
-    #tokens {
-      background:#8e44ad;
-      padding:10px;
-      border-radius:10px;
-      float:right;
-    }
-
-    .tab { display:none; }
-    .show { display:block; }
-
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(3,200px);
-      gap:20px;
-      justify-content:center;
-      margin-top:20px;
-    }
-
-    .pack {
-      border-radius:20px;
-      padding:15px;
-      cursor:pointer;
-      color:white;
-      font-weight:bold;
-    }
-
-    .pack:hover { transform:scale(1.05); }
-
-    .packArt { font-size:50px; }
-
-    .price {
-      background:#00000033;
-      padding:5px;
-      border-radius:10px;
-      margin-top:10px;
-    }
-
-    /* COLORS */
-    .toy { background:#f39c12; }
-    .sport { background:#3498db; }
-    .game { background:#2ecc71; }
-    .spooky { background:#8e44ad; }
-    .autumn { background:#d35400; }
-    .blizzard { background:#5dade2; }
-    .lovely { background:#ff66cc; }
-    .lucky { background:#27ae60; }
-    .spring { background:#f1c40f; }
-
-    #openScreen {
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      background:black;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-    }
-
-    #card {
-      width:200px;
-      height:250px;
-      border-radius:20px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:40px;
-      color:white;
-    }
-
-    .Uncommon { background:#6b7280; }
-    .Rare { background:#3b82f6; }
-    .Epic { background:#a855f7; }
-    .Legendary { background:#f59e0b; }
-    .Chroma { background:linear-gradient(45deg,red,yellow,green,blue); }
-    .Mystical { background:gold; color:black; }
-
-    .item {
-      display:inline-block;
-      margin:5px;
-      padding:10px;
-      border-radius:10px;
-      background:#334155;
-      font-size:20px;
-    }
-  </style>/* SHAKE */
-@keyframes shake {
-  0%{transform:translateX(0);}
-  25%{transform:translateX(-6px);}
-  50%{transform:translateX(6px);}
-  75%{transform:translateX(-6px);}
-  100%{transform:translateX(0);}
-}
-.shake { animation:shake 0.3s; }
-
-/* FLASH */
-#flash {
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:white;
-  opacity:0;
-  pointer-events:none;
-}
-.flash { opacity:0.8; }
-
-/* RARITY EFFECTS */
-.Legendary { box-shadow:0 0 30px gold; }
-.Chroma { animation:rainbow 1s infinite; }
-.Mystical { animation:pulse 0.5s infinite; }
-
-@keyframes rainbow {
-  0%{filter:hue-rotate(0deg);}
-  100%{filter:hue-rotate(360deg);}
+    return { success: false, reason: "Not enough tokens" };
 }
 
-@keyframes pulse {
-  0%{transform:scale(1);}
-  50%{transform:scale(1.1);}
-  100%{transform:scale(1);}
+// 3. Analytics (View Progress)
+function getPlayerStats() {
+    const user = getUser();
+    return user.stats;
 }
 
-/* LOCKED PACK */
-.locked {
-  opacity:0.4;
-  cursor:not-allowed;
-}
-.countdown {
-  font-size:12px;
-  margin-top:5px;
-}
-</head>
-
-<body>
-
-<div id="sidebar">
-  <h2>Funlet</h2>
-  <div class="tabBtn active" onclick="switchTab('market', this)">Market</div>
-  <div class="tabBtn" onclick="switchTab('blooks', this)">Blooks</div>
-  <div class="tabBtn" onclick="switchTab('auction', this)">Auction</div>
-  <div class="tabBtn" onclick="switchTab('news', this)">News</div>
-</div>
-
-<div id="main">
-<div id="tokens"></div>
-
-<!-- MARKET -->
-<div id="market" class="tab show">
-  <h1>Market</h1>
-  <div class="grid" id="packGrid"></div>
-</div>
-
-<!-- BLOOKS -->
-<div id="blooks" class="tab">
-  <h1>Your Blooks</h1>
-  <div id="inventory"></div>
-</div>
-
-<!-- AUCTION -->
-<div id="auction" class="tab">
-  <h1>Auction</h1>
-  <p>Items you pull will show here soon 👀</p>
-</div>
-
-<!-- NEWS -->
-<div id="news" class="tab">
-  <h1>News</h1>
-  <p>🔥 Seasonal packs added!</p>
-</div>
-
-</div>
-
-<div id="openScreen">
-  <div id="card">?</div>
-  <h2 id="result"></h2>
-  <button onclick="closeOpen()">Close</button>
-</div>
-
-<script>
-let tokens = 100000;
-let inventory = [];
-
-/* PACK DATA */
-const packs = {
-  toy:{Uncommon:["🧸"],Rare:["🤖"],Epic:["🛸"],Legendary:["🦖"],Chroma:["🌈🧸"],Mystical:["👑🧸"]},
-  sport:{Uncommon:["🏀"],Rare:["🏈"],Epic:["🏆"],Legendary:["🥇"],Chroma:["🌈🏀"],Mystical:["👑🏆"]},
-  game:{Uncommon:["🎮"],Rare:["🕹️"],Epic:["💻"],Legendary:["👾"],Chroma:["🌈👾"],Mystical:["👑👾"]},
-
-  spooky:{Uncommon:["🎃"],Rare:["👻"],Epic:["🕷️"],Legendary:["💀"],Chroma:["🌈🎃"],Mystical:["👑🎃"]},
-  autumn:{Uncommon:["🍂"],Rare:["🍁"],Epic:["🌰"],Legendary:["🦃"],Chroma:["🌈🍂"],Mystical:["👑🍂"]},
-  blizzard:{Uncommon:["❄️"],Rare:["⛄"],Epic:["🧊"],Legendary:["🌨️"],Chroma:["🌈❄️"],Mystical:["👑❄️"]},
-
-  lovely:{Uncommon:["💖"],Rare:["🌹"],Epic:["💘"],Legendary:["❤️"],Chroma:["🌈💖"],Mystical:["👑💖"]},
-  lucky:{Uncommon:["🍀"],Rare:["🌈"],Epic:["💰"],Legendary:["🪙"],Chroma:["🌈🍀"],Mystical:["👑🍀"]},
-  spring:{Uncommon:["🌸"],Rare:["🐣"],Epic:["🥚"],Legendary:["🐰"],Chroma:["🌈🌸"],Mystical:["👑🌸"]}
-};
-
-/* TABS */
-function switchTab(tab, el){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("show"));
-  document.getElementById(tab).classList.add("show");
-
-  document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
-  el.classList.add("active");
+// 4. Social: Export set for sharing (as JSON)
+function exportSet(setId) {
+    const sets = getSets();
+    const set = sets.find(s => s.id === setId);
+    return JSON.stringify(set);
 }
 
-/* RARITY */
-function getRarity(){
-  let r=Math.random()*100;
-  if(r<0.001) return "Mystical";
-  if(r<0.02) return "Chroma";
-  if(r<0.5) return "Legendary";
-  if(r<3) return "Epic";
-  if(r<15) return "Rare";
-  return "Uncommon";
-}
-
-/* TIME BASED PACKS */
-function getAvailablePacks(){
-  let m = new Date().getMonth();
-  let d = new Date();
-
-  let list = ["toy","sport","game"];
-
-  if(m===9) list.push("spooky");
-  if(m===10) list.push("autumn");
-  if(m===11) list.push("blizzard");
-
-  if(m===1 && d.getDate()===14) list.push("lovely");
-  if(m===2 && d.getDate()===17) list.push("lucky");
-  if(m===3) list.push("spring");
-
-  return list;
-}
-
-/* LOAD PACKS */
-function loadPacks(){
-  let grid=document.getElementById("packGrid");
-  grid.innerHTML="";
-
-  getAvailablePacks().forEach(p=>{
-    let div=document.createElement("div");
-    div.className="pack "+p;
-
-    div.innerHTML=`
-      <div class="packArt">${getIcon(p)}</div>
-      ${p.toUpperCase()} PACK
-      <div class="price">💰 25</div>
-    `;
-
-    div.onclick=()=>openPack(p);
-    grid.appendChild(div);
-  });
-}
-
-function getIcon(p){
-  return {
-    toy:"🧸",sport:"🏀",game:"🎮",
-    spooky:"🎃",autumn:"🍂",blizzard:"❄️",
-    lovely:"💖",lucky:"🍀",spring:"🌸"
-  }[p];
-}
-
-/* OPEN PACK */
-function openPack(type){
-  if(tokens<25) return;
-
-  tokens-=25;
-  updateTokens();
-
-  document.getElementById("openScreen").style.display="flex";
-
-  let card=document.getElementById("card");
-  let spins=0;
-
-  let interval=setInterval(()=>{
-    let rarity=getRarity();
-    let item=packs[type][rarity][0];
-
-    card.className=rarity;
-    card.innerText=item;
-
-    spins++;
-
-    if(spins>12){
-      clearInterval(interval);
-
-      inventory.push(item);
-      updateInventory();
-
-      document.getElementById("result").innerText=
-        "🎉 "+item+" ["+rarity+"]";
-    }
-
-  },100);
-}
-
-function closeOpen(){
-  document.getElementById("openScreen").style.display="none";
-}
-
-function updateTokens(){
-  document.getElementById("tokens").innerText="💰 "+tokens;
-}
-
-function updateInventory(){
-  let div=document.getElementById("inventory");
-  div.innerHTML="";
-  inventory.forEach(i=>{
-    let d=document.createElement("div");
-    d.className="item";
-    d.innerText=i;
-    div.appendChild(d);
-  });
-}
-
-updateTokens();
-loadPacks();
-</script>function loadPacks(){
-  let grid=document.getElementById("packGrid");
-  grid.innerHTML="";
-
-  let available = ["toy","sport","game"];
-
-  available.forEach(p=>{
-    let div=document.createElement("div");
-    div.className="pack "+p;
-
-    div.innerHTML=`
-      <div class="packArt">${getIcon(p)}</div>
-      ${p.toUpperCase()} PACK
-      <div class="price">💰 25</div>
-    `;
-
-    div.onclick=()=>openPack(p, div);
-
-    grid.appendChild(div);
-  });
-}
-
-</body>
-</html>
+// Example: Create a new set
+createSet("Algebra 1", [
+    { q: "2+2", a1: "3", a2: "4", a3: "5", a4: "6", correct: 2, time: 20 }
+]);
