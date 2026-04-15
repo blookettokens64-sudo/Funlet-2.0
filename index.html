@@ -1,66 +1,103 @@
-// --- FUNLET CORE DATA ENGINE ---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Funlet - Better Than Blooket</title>
+    <style>
+        :root { --primary: #3a86ff; --bg: #f8f9fa; --text: #333; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; display: flex; }
+        #sidebar { width: 200px; background: white; height: 100vh; border-right: 1px solid #ddd; padding: 20px; }
+        .nav-btn { display: block; width: 100%; padding: 10px; margin-bottom: 10px; border: none; background: #eee; cursor: pointer; border-radius: 5px; }
+        .nav-btn:hover { background: var(--primary); color: white; }
+        #main-content { flex-grow: 1; padding: 40px; }
+        .blook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
+        .blook-card { background: white; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
 
-// Initialize user data (Tokens, Blooks, Stats)
-if (!localStorage.getItem('funletUser')) {
-    localStorage.setItem('funletUser', JSON.stringify({
-        tokens: 0,
-        blooks: ['DefaultBlook'], // Starts with one
-        equippedBlook: 'DefaultBlook',
-        stats: { questionsAnswered: 0 }
-    }));
-}
+<div id="sidebar">
+    <h2>Funlet</h2>
+    <p>Tokens: <span id="token-count">500</span></p>
+    <button class="nav-btn" onclick="showPage('market')">Market</button>
+    <button class="nav-btn" onclick="showPage('inventory')">Blooks</button>
+    <button class="nav-btn" onclick="showPage('creator')">Set Creator</button>
+</div>
 
-// Initialize question sets
-if (!localStorage.getItem('funletSets')) {
-    localStorage.setItem('funletSets', JSON.stringify([]));
-}
+<div id="main-content">
+    <!-- MARKET PAGE -->
+    <div id="market-page">
+        <h1>Market</h1>
+        <div class="blook-card">
+            <h3>Starter Pack</h3>
+            <p>Cost: 20 Tokens</p>
+            <button onclick="openPack()">Open Pack</button>
+        </div>
+    </div>
 
-// Load User Data
-const getUser = () => JSON.parse(localStorage.getItem('funletUser'));
-const getSets = () => JSON.parse(localStorage.getItem('funletSets'));
+    <!-- INVENTORY PAGE -->
+    <div id="inventory-page" class="hidden">
+        <h1>Your Blooks</h1>
+        <div id="blook-list" class="blook-grid"></div>
+    </div>
 
-// --- FUNCTIONS FOR "BETTER THAN BLOOKET" FEATURES ---
+    <!-- SET CREATOR PAGE -->
+    <div id="creator-page" class="hidden">
+        <h1>Set Creator</h1>
+        <input type="text" id="set-title" placeholder="Set Title">
+        <button onclick="saveSet()">Save Set</button>
+        <div id="questions-list"></div>
+    </div>
+</div>
 
-// 1. Better Creation: Add new question set
-function createSet(title, questions) {
-    const sets = getSets();
-    const newSet = {
-        id: Date.now(), // Unique ID
-        title: title,
-        questions: questions, // Array of {q, a1, a2, a3, a4, correct, time}
-        createdAt: new Date().toLocaleDateString()
+<script>
+    // App State
+    let state = {
+        tokens: 500,
+        inventory: ["Standard Blook"],
+        availableBlooks: ["Alien", "Robot", "Dino", "Dragon", "Wizard"],
+        sets: []
     };
-    sets.push(newSet);
-    localStorage.setItem('funletSets', JSON.stringify(sets));
-    return newSet;
-}
 
-// 2. The Market (Buying Blooks)
-function buyBlookPack(packName, cost) {
-    let user = getUser();
-    if (user.tokens >= cost) {
-        user.tokens -= cost;
-        // Logic to add a random blook from the pack to user.blooks
-        localStorage.setItem('funletUser', JSON.stringify(user));
-        return { success: true, blook: "NewBlook" };
+    function showPage(pageId) {
+        document.getElementById('market-page').classList.add('hidden');
+        document.getElementById('inventory-page').classList.add('hidden');
+        document.getElementById('creator-page').classList.add('hidden');
+        document.getElementById(pageId + '-page').classList.remove('hidden');
+        if(pageId === 'inventory') renderInventory();
     }
-    return { success: false, reason: "Not enough tokens" };
-}
 
-// 3. Analytics (View Progress)
-function getPlayerStats() {
-    const user = getUser();
-    return user.stats;
-}
+    function openPack() {
+        if (state.tokens >= 20) {
+            state.tokens -= 20;
+            const newBlook = state.availableBlooks[Math.floor(Math.random() * state.availableBlooks.length)];
+            state.inventory.push(newBlook);
+            updateUI();
+            alert("You got a " + newBlook + "!");
+        } else {
+            alert("Not enough tokens!");
+        }
+    }
 
-// 4. Social: Export set for sharing (as JSON)
-function exportSet(setId) {
-    const sets = getSets();
-    const set = sets.find(s => s.id === setId);
-    return JSON.stringify(set);
-}
+    function renderInventory() {
+        const list = document.getElementById('blook-list');
+        list.innerHTML = state.inventory.map(b => `<div class="blook-card">${b}</div>`).join('');
+    }
 
-// Example: Create a new set
-createSet("Algebra 1", [
-    { q: "2+2", a1: "3", a2: "4", a3: "5", a4: "6", correct: 2, time: 20 }
-]);
+    function updateUI() {
+        document.getElementById('token-count').innerText = state.tokens;
+    }
+
+    function saveSet() {
+        const title = document.getElementById('set-title').value;
+        if(title) {
+            state.sets.push({title, questions: []});
+            alert("Set '" + title + "' saved!");
+            document.getElementById('set-title').value = "";
+        }
+    }
+</script>
+
+</body>
+</html>
