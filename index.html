@@ -4,93 +4,83 @@
     <meta charset="UTF-8">
     <title>Funlet - Better Than Blooket</title>
     <style>
-        :root { --primary: #3a86ff; --bg: #f8f9fa; --text: #333; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; display: flex; }
-        #sidebar { width: 200px; background: white; height: 100vh; border-right: 1px solid #ddd; padding: 20px; }
-        .nav-btn { display: block; width: 100%; padding: 10px; margin-bottom: 10px; border: none; background: #eee; cursor: pointer; border-radius: 5px; }
-        .nav-btn:hover { background: var(--primary); color: white; }
-        #main-content { flex-grow: 1; padding: 40px; }
-        .blook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
-        .blook-card { background: white; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
-        .hidden { display: none; }
+        body { font-family: sans-serif; background: #111; color: white; text-align: center; }
+        .box { background: #222; padding: 20px; border-radius: 10px; margin: 20px auto; width: 300px; border: 2px solid #3a86ff; }
+        button { background: #3a86ff; border: none; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .stat { color: #ffd700; font-weight: bold; }
     </style>
 </head>
 <body>
-<div id="sidebar">
-    <h2>Funlet</h2>
-    <p>Tokens: <span id="token-count">500</span></p>
-    <button class="nav-btn" onclick="showPage('market')">Market</button>
-    <button class="nav-btn" onclick="showPage('inventory')">Blooks</button>
-    <button class="nav-btn" onclick="showPage('creator')">Set Creator</button>
-</div>
-<div id="main-content">
-    <!-- MARKET PAGE -->
-    <div id="market-page">
-        <h1>Market</h1>
-        <div class="blook-card">
-            <h3>Starter Pack</h3>
-            <p>Cost: 20 Tokens</p>
-            <button onclick="openPack()">Open Pack</button>
-        </div>
+
+    <h1>FUNLET</h1>
+    <div class="box">
+        <p>Tokens: <span id="token-val" class="stat">0</span></p>
+        <p>Blooks: <span id="blook-count" class="stat">1</span></p>
     </div>
-    <!-- INVENTORY PAGE -->
-    <div id="inventory-page" class="hidden">
-        <h1>Your Blooks</h1>
-        <div id="blook-list" class="blook-grid"></div>
+
+    <div class="box">
+        <h3>Space Pack</h3>
+        <p>Cost: 25 Tokens</p>
+        <button onclick="handleBuy()">Buy Pack</button>
     </div>
-    <!-- SET CREATOR PAGE -->
-    <div id="creator-page" class="hidden">
-        <h1>Set Creator</h1>
-        <input type="text" id="set-title" placeholder="Set Title">
-        <button onclick="saveSet()">Save Set</button>
-        <div id="questions-list"></div>
+
+    <div class="box">
+        <h3>Set Creator</h3>
+        <button onclick="handleCreate()">Create Algebra Set</button>
     </div>
-</div>
-<script>
-    // App State
-    let state = {
-        tokens: 500,
-        inventory: ["Standard Blook"],
-        availableBlooks: ["Alien", "Robot", "Dino", "Dragon", "Wizard"],
-        sets: []
-    };
-    function showPage(pageId) {
-        document.getElementById('market-page').classList.add('hidden');
-        document.getElementById('inventory-page').classList.add('hidden');
-        document.getElementById('creator-page').classList.add('hidden');
-        document.getElementById(pageId + '-page').classList.remove('hidden');
-        if(pageId === 'inventory') renderInventory();
-    }
-    function openPack() {
-        if (state.tokens >= 20) {
-            state.tokens -= 20;
-            const newBlook = state.availableBlooks[Math.floor(Math.random() * state.availableBlooks.length)];
-            state.inventory.push(newBlook);
+
+    <script>
+        // --- YOUR CORE DATA ENGINE (From Image) ---
+        if (!localStorage.getItem('funletUser')) {
+            localStorage.setItem('funletUser', JSON.stringify({ tokens: 100, blooks: ['DefaultBlook'], stats: { questionsAnswered: 0 } }));
+        }
+        if (!localStorage.getItem('funletSets')) {
+            localStorage.setItem('funletSets', JSON.stringify([]));
+        }
+
+        const getUser = () => JSON.parse(localStorage.getItem('funletUser'));
+        const getSets = () => JSON.parse(localStorage.getItem('funletSets'));
+
+        function createSet(title, questions) {
+            const sets = getSets();
+            const newSet = { id: Date.now(), title, questions, createdAt: new Date().toLocaleDateString() };
+            sets.push(newSet);
+            localStorage.setItem('funletSets', JSON.stringify(sets));
+            return newSet;
+        }
+
+        function buyBlookPack(packName, cost) {
+            let user = getUser();
+            if (user.tokens >= cost) {
+                user.tokens -= cost;
+                const newBlook = "RareBlook_" + Math.floor(Math.random() * 100);
+                user.blooks.push(newBlook);
+                localStorage.setItem('funletUser', JSON.stringify(user));
+                return { success: true, blook: newBlook };
+            }
+            return { success: false, reason: "Not enough tokens" };
+        }
+
+        // --- UI GLUE ---
+        function updateUI() {
+            const user = getUser();
+            document.getElementById('token-val').innerText = user.tokens;
+            document.getElementById('blook-count').innerText = user.blooks.length;
+        }
+
+        function handleBuy() {
+            const res = buyBlookPack("Space", 25);
+            if (res.success) { alert("Got: " + res.blook); } 
+            else { alert(res.reason); }
             updateUI();
-            alert("You got a " + newBlook + "!");
-        } else {
-            alert("Not enough tokens!");
         }
-    }
 
-    function renderInventory() {
-        const list = document.getElementById('blook-list');
-        list.innerHTML = state.inventory.map(b => `<div class="blook-card">${b}</div>`).join('');
-    }
-
-    function updateUI() {
-        document.getElementById('token-count').innerText = state.tokens;
-    }
-
-    function saveSet() {
-        const title = document.getElementById('set-title').value;
-        if(title) {
-            state.sets.push({title, questions: []});
-            alert("Set '" + title + "' saved!");
-            document.getElementById('set-title').value = "";
+        function handleCreate() {
+            createSet("Algebra 1", [{ q: "2+2", a1: "3", a2: "4", correct: 2 }]);
+            alert("Set Created!");
         }
-    }
-</script>
 
+        updateUI(); // Run on load
+    </script>
 </body>
 </html>
