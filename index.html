@@ -16,7 +16,6 @@
     </style>
 </head>
 <body>
-
 <div id="sidebar">
     <h2>Funlet</h2>
     <p>Tokens: <span id="token-count">500</span></p>
@@ -24,7 +23,6 @@
     <button class="nav-btn" onclick="showPage('inventory')">Blooks</button>
     <button class="nav-btn" onclick="showPage('creator')">Set Creator</button>
 </div>
-
 <div id="main-content">
     <!-- MARKET PAGE -->
     <div id="market-page">
@@ -35,13 +33,11 @@
             <button onclick="openPack()">Open Pack</button>
         </div>
     </div>
-
     <!-- INVENTORY PAGE -->
     <div id="inventory-page" class="hidden">
         <h1>Your Blooks</h1>
         <div id="blook-list" class="blook-grid"></div>
     </div>
-
     <!-- SET CREATOR PAGE -->
     <div id="creator-page" class="hidden">
         <h1>Set Creator</h1>
@@ -50,7 +46,6 @@
         <div id="questions-list"></div>
     </div>
 </div>
-
 <script>
     // App State
     let state = {
@@ -59,7 +54,6 @@
         availableBlooks: ["Alien", "Robot", "Dino", "Dragon", "Wizard"],
         sets: []
     };
-
     function showPage(pageId) {
         document.getElementById('market-page').classList.add('hidden');
         document.getElementById('inventory-page').classList.add('hidden');
@@ -67,7 +61,6 @@
         document.getElementById(pageId + '-page').classList.remove('hidden');
         if(pageId === 'inventory') renderInventory();
     }
-
     function openPack() {
         if (state.tokens >= 20) {
             state.tokens -= 20;
