@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Funlet Market</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      text-align: center;
+    }
+
+    #shop {
+      margin-top: 20px;
+    }
+
+    .pack {
+      background: #222;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 10px;
+      display: inline-block;
+      width: 200px;
+    }
+
+    button {
+      padding: 8px 12px;
+      background: #3a86ff;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🛒 Funlet Market</h1>
+  <div id="shop"></div>
+
+  <script>
+    // PACKS
+    const packs = [
+      { id: "spooky", name: "🎃 Spooky Pack", price: 100 },
+      { id: "autumn", name: "🍂 Autumn Pack", price: 120 },
+      { id: "blizzard", name: "❄️ Blizzard Pack", price: 150 }
+    ];
+
+    // SHOP
+    const shop = document.getElementById("shop");
+
+    function renderShop() {
+      shop.innerHTML = "";
+
+      packs.forEach(pack => {
+        const div = document.createElement("div");
+        div.className = "pack";
+
+        div.innerHTML = `
+          <h3>${pack.name}</h3>
+          <p>💰 ${pack.price}</p>
+          <button onclick="buyPack('${pack.id}')">Buy</button>
+        `;
+
+        shop.appendChild(div);
+      });
+    }
+
+    function buyPack(id) {
+      alert("Bought: " + id);
+    }
+
+    renderShop();
+  </script>
+
+</body>
+</html>
