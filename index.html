@@ -1,86 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Funlet - Better Than Blooket</title>
-    <style>
-        body { font-family: sans-serif; background: #111; color: white; text-align: center; }
-        .box { background: #222; padding: 20px; border-radius: 10px; margin: 20px auto; width: 300px; border: 2px solid #3a86ff; }
-        button { background: #3a86ff; border: none; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .stat { color: #ffd700; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Funlet Market</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      text-align: center;
+    }
+
+    #shop {
+      margin-top: 20px;
+    }
+
+    .pack {
+      background: #222;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 10px;
+      display: inline-block;
+      width: 200px;
+    }
+
+    button {
+      padding: 8px 12px;
+      background: #3a86ff;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+
 </head>
+
 <body>
 
-    <h1>FUNLET</h1>
-    <div class="box">
-        <p>Tokens: <span id="token-val" class="stat">0</span></p>
-        <p>Blooks: <span id="blook-count" class="stat">1</span></p>
-    </div>
+  <h1>🛒 Funlet Market</h1>
+  <div id="shop"></div>
 
-    <div class="box">
-        <h3>Space Pack</h3>
-        <p>Cost: 25 Tokens</p>
-        <button onclick="handleBuy()">Buy Pack</button>
-    </div>
+  <!-- LOAD ORDER MATTERS -->
+  <script src="js/packs.js"></script>
+  <script src="js/shop.js"></script>
 
-    <div class="box">
-        <h3>Set Creator</h3>
-        <button onclick="handleCreate()">Create Algebra Set</button>
-    </div>
-
-    <script>
-        // --- YOUR CORE DATA ENGINE (From Image) ---
-        if (!localStorage.getItem('funletUser')) {
-            localStorage.setItem('funletUser', JSON.stringify({ tokens: 100, blooks: ['DefaultBlook'], stats: { questionsAnswered: 0 } }));
-        }
-        if (!localStorage.getItem('funletSets')) {
-            localStorage.setItem('funletSets', JSON.stringify([]));
-        }
-
-        const getUser = () => JSON.parse(localStorage.getItem('funletUser'));
-        const getSets = () => JSON.parse(localStorage.getItem('funletSets'));
-
-        function createSet(title, questions) {
-            const sets = getSets();
-            const newSet = { id: Date.now(), title, questions, createdAt: new Date().toLocaleDateString() };
-            sets.push(newSet);
-            localStorage.setItem('funletSets', JSON.stringify(sets));
-            return newSet;
-        }
-
-        function buyBlookPack(packName, cost) {
-            let user = getUser();
-            if (user.tokens >= cost) {
-                user.tokens -= cost;
-                const newBlook = "RareBlook_" + Math.floor(Math.random() * 100);
-                user.blooks.push(newBlook);
-                localStorage.setItem('funletUser', JSON.stringify(user));
-                return { success: true, blook: newBlook };
-            }
-            return { success: false, reason: "Not enough tokens" };
-        }
-
-        // --- UI GLUE ---
-        function updateUI() {
-            const user = getUser();
-            document.getElementById('token-val').innerText = user.tokens;
-            document.getElementById('blook-count').innerText = user.blooks.length;
-        }
-
-        function handleBuy() {
-            const res = buyBlookPack("Space", 25);
-            if (res.success) { alert("Got: " + res.blook); } 
-            else { alert(res.reason); }
-            updateUI();
-        }
-
-        function handleCreate() {
-            createSet("Algebra 1", [{ q: "2+2", a1: "3", a2: "4", correct: 2 }]);
-            alert("Set Created!");
-        }
-
-        updateUI(); // Run on load
-    </script>
 </body>
 </html>
